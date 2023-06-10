@@ -8,14 +8,6 @@ import com.example.signin.Dto.UserDto;
 import com.example.signin.Enums.Role;
 import com.example.signin.Responses.ServerResponse;
 import com.example.signin.Service.UsersService;
-import jakarta.mail.Message;
-import jakarta.mail.MessagingException;
-import jakarta.mail.Multipart;
-import jakarta.mail.Transport;
-import jakarta.mail.internet.InternetAddress;
-import jakarta.mail.internet.MimeBodyPart;
-import jakarta.mail.internet.MimeMessage;
-import jakarta.mail.internet.MimeMultipart;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,7 +49,7 @@ public class UsersControler {
             createdUser.setToken(userAuthenticationProvider.createToken(registerDto.getEmail()));
             return ResponseEntity.ok(ServerResponse.<UserDto>builder().data(createdUser).message("").build());
         } catch (RuntimeException ru) {
-            return ResponseEntity.ok(ServerResponse.<UserDto>builder().data(null).message(ru.getMessage()).status(400).build());
+            return ResponseEntity.badRequest().body((ServerResponse.<UserDto>builder().data(null).message(ru.getMessage()).status(400).build()));
         }
     }
 
@@ -96,7 +88,7 @@ public class UsersControler {
 
     @PostMapping ("/asda")
     public boolean aasd() {
-        emailConfiguration.sendMessage("saq@mailinator.com");
+        emailConfiguration.sendMessage("saq@mailinator.com", "zxvc");
        return true;
     }
 

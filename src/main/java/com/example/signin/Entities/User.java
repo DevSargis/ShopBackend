@@ -29,4 +29,9 @@ public class User {
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "role_id", referencedColumnName = "id")
     private Role roleId;
+    @Column(name = "created_at")
+    private Long createdAt;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private MailVerifier mailVerifier;
 }

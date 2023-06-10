@@ -2,6 +2,8 @@ package com.example.signin.Dto;
 
 import lombok.*;
 
+import java.util.Date;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -13,4 +15,5 @@ public class RegisterDto {
     private String password;
     private String email;
     private String phoneNumber;
+    private Long createdAt = new Date().getTime();
 }

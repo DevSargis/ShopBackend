@@ -13,7 +13,7 @@ import java.util.Properties;
 @Slf4j
 public class EmailConfiguration {
     private static final String PROPERTIES_FILE = "application.properties";
-    public void sendMessage(String to) {
+    public void sendMessage(String to, String content) {
         Properties props = loadProperties();
         String from = props.getProperty("mail.from");
         String password = props.getProperty("mail.password");
@@ -28,7 +28,7 @@ public class EmailConfiguration {
             message.setFrom(new InternetAddress(from));
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
             message.setSubject("Test message");
-            message.setText("This message sended by JavaMailApi");
+            message.setText(content);
             Transport.send(message);
             log.debug("Successfully sent to " + to);
         }catch (MessagingException e){
