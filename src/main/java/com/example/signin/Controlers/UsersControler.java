@@ -1,10 +1,21 @@
 package com.example.signin.Controlers;
 
+import com.example.signin.Config.EmailConfiguration;
 import com.example.signin.Config.UserAuthProvider;
 import com.example.signin.Dto.AuthCredentialsDto;
 import com.example.signin.Dto.RegisterDto;
 import com.example.signin.Dto.UserDto;
+import com.example.signin.Enums.Role;
+import com.example.signin.Responses.ServerResponse;
 import com.example.signin.Service.UsersService;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
+import jakarta.mail.Multipart;
+import jakarta.mail.Transport;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeBodyPart;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMultipart;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +33,9 @@ public class UsersControler {
     @Autowired
     UsersService usersService;
 
+    @Autowired
+    EmailConfiguration emailConfiguration;
+
     private final UserAuthProvider userAuthenticationProvider;
 
     @PostMapping(path = "/save")
@@ -37,13 +51,17 @@ public class UsersControler {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserDto> register(@RequestBody RegisterDto registerDto) {
-        UserDto createdUser = usersService.register(registerDto);
-        createdUser.setToken(userAuthenticationProvider.createToken(registerDto.getEmail()));
-        return ResponseEntity.ok(createdUser);
+    public ResponseEntity<ServerResponse<UserDto>> register(@RequestBody RegisterDto registerDto) {
+        try {
+            UserDto createdUser = usersService.register(registerDto, Role.USER);
+            createdUser.setToken(userAuthenticationProvider.createToken(registerDto.getEmail()));
+            return ResponseEntity.ok(ServerResponse.<UserDto>builder().data(createdUser).message("").build());
+        } catch (RuntimeException ru) {
+            return ResponseEntity.ok(ServerResponse.<UserDto>builder().data(null).message(ru.getMessage()).status(400).build());
+        }
     }
 
-    @GetMapping("/asd")
+    @GetMapping("/test")
     public ResponseEntity<Boolean> asd(HttpServletRequest request) {
         String header = request.getHeader(HttpHeaders.AUTHORIZATION);
         boolean s = false;
@@ -58,6 +76,33 @@ public class UsersControler {
         }
         return ResponseEntity.ok(s);
     }
+
+    @PostMapping ("/superUser")
+    public ResponseEntity<Boolean> createSuperUser(HttpServletRequest request) {
+        usersService.register(RegisterDto.builder().
+                firstName("Sargis").
+                lastName("Margaryan").
+                email("sargismargaryan1998@gmail.com").
+                phoneNumber("+37477753508").
+                password("test1234").build(), Role.ADMIN);
+        usersService.register(RegisterDto.builder().
+                firstName("Arayik").
+                lastName("Petrosyan").
+                email("arayik.petrosian@mail.ru").
+                phoneNumber("+37477420241").
+                password("test1234").build(), Role.ADMIN);
+       return ResponseEntity.ok(true);
+    }
+
+    @PostMapping ("/asda")
+    public boolean aasd() {
+        emailConfiguration.sendMessage("saq@mailinator.com");
+       return true;
+    }
+
+
+
+
 
 
 }

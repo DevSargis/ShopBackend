@@ -24,4 +24,9 @@ public class User {
     private String email;
     @Column(name = "phone")
     private String phoneNumber;
+    @Column(name = "email_is_confirmed", columnDefinition = "boolean default false")
+    private boolean emailIsConfirmed;
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "role_id", referencedColumnName = "id")
+    private Role roleId;
 }

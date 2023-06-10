@@ -4,12 +4,10 @@ import com.example.signin.Dto.AuthCredentialsDto;
 import com.example.signin.Dto.RegisterDto;
 import com.example.signin.Dto.UserDto;
 import com.example.signin.Entities.User;
+import com.example.signin.Enums.Role;
 import com.example.signin.Exceptions.AppException;
 import com.example.signin.Mappers.UserMapper;
 import com.example.signin.Repository.UsersRepository;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import org.mapstruct.control.MappingControl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,6 +22,8 @@ public class UsersService {
     UsersRepository usersRepository;
     @Autowired
     PasswordEncoder passwordEncoder;
+    @Autowired
+    RoleService roleService;
 
     public String save(RegisterDto registerDto) {
         User user = User.builder().
@@ -42,17 +42,16 @@ public class UsersService {
         return UserMapper.INSTANCE.toUserDto(user);
     }
 
-    public UserDto register(RegisterDto registerDto) {
+    public UserDto register(RegisterDto registerDto, Role roleUser) throws RuntimeException{
         Optional<User> optionalUser = usersRepository.findByEmail(registerDto.getEmail());
 
         if (optionalUser.isPresent()) {
             throw new AppException("Login already exists", HttpStatus.BAD_REQUEST);
         }
         User user = UserMapper.INSTANCE.signUpToUser(registerDto);
+        user.setRoleId(roleService.getRole(roleUser.getValue()));
         user.setPassword(passwordEncoder.encode(CharBuffer.wrap(registerDto.getPassword())));
-
         User savedUser = usersRepository.save(user);
-
         return UserMapper.INSTANCE.toUserDto(savedUser);
     }
 
