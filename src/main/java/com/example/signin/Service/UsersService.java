@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.nio.CharBuffer;
 import java.util.Date;
 import java.util.Locale;
@@ -55,6 +57,7 @@ public class UsersService {
         return UserMapper.INSTANCE.toUserDto(user);
     }
 
+    @Transactional
     public UserDto register(RegisterDto registerDto, Role roleUser) throws RuntimeException{
         Optional<User> optionalUser = usersRepository.findByEmail(registerDto.getEmail());
 
@@ -68,10 +71,14 @@ public class UsersService {
         User savedUser = usersRepository.save(user);
         String code = UUID.randomUUID().toString().replace("-", "").substring(0, 6).toUpperCase(Locale.ROOT);
         mailVerificationService.save(MailVerifier.builder().user(savedUser).Code(code).createdAt(new Date().getTime()).build());
-        emailConfiguration.sendMessage(savedUser.getEmail(),
-                "                    Welcome to ArSaKa                 \n\n" +
-                        "Your code for verification " + code
-        );
+        try {
+            emailConfiguration.sendMessage(savedUser.getEmail(),
+                    "                    Welcome to ArSaKa                 \n\n" +
+                            "Your code for verification " + code
+            );
+        }catch (Exception ex){
+            throw ex;
+        }
         return UserMapper.INSTANCE.toUserDto(savedUser);
     }
 

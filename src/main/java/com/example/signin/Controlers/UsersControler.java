@@ -49,7 +49,7 @@ public class UsersControler {
             createdUser.setToken(userAuthenticationProvider.createToken(registerDto.getEmail()));
             return ResponseEntity.ok(ServerResponse.<UserDto>builder().data(createdUser).message("").build());
         } catch (RuntimeException ru) {
-            return ResponseEntity.badRequest().body((ServerResponse.<UserDto>builder().data(null).message(ru.getMessage()).status(400).build()));
+            throw ru;
         }
     }
 
