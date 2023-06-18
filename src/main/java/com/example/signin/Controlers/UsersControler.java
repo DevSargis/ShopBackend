@@ -92,7 +92,11 @@ public class UsersControler {
        return true;
     }
 
-
+    @PostMapping ("/test")
+    public boolean test() {
+        emailConfiguration.sendMessage("saq@mailinator.com", "zxvc");
+        return true;
+    }
 
 
 
