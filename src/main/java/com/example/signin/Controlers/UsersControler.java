@@ -88,6 +88,7 @@ public class UsersControler {
 
     @PostMapping ("/asda")
     public boolean aasd() {
+
         emailConfiguration.sendMessage("saq@mailinator.com", "zxvc");
        return true;
     }
